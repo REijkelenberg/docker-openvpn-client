@@ -31,3 +31,16 @@ docker run -it --rm \
   --net=container:vpn-client
   ubuntu /bin/bash
 ```
+
+# Example
+Consider the scenario in which someone would like to run [Jackett](https://github.com/hotio/docker-jackett) (a crawler for various torrent sites) behind the OpenVPN client container. Jackett will be accessible to the world wide web through an Nginx reverse proxy (see for instance my [nginx-proxy Docker image](https://github.com/REijkelenberg/nginx-proxy))
+
+First, set up the OpenVPN client container. Expose the port behind which Jackett runs. Also define the hostname on which Jackett should be made available.
+```
+docker run -d --name openvpn-client --cap-add=NET_ADMIN --device /dev/net/tun --dns 10.8.8.1 -p 127.0.0.1:9117:9117 -e VIRTUAL_HOST=jackett.example.com -e VIRTUAL_PORT=9117 -v /path/with/vpn/configs:/vpn reijkelenberg/openvpn-client:latest --config /vpn/client.ovpn
+```
+
+Next, start the Jackett container _without exposing any ports_. The Jackett container will use the same network stack as the OpenVPN client container.
+```
+docker run -d --name jackett --net=container:vpn-client -v /path/to/jackett/config:/config hotio/jackett
+```
