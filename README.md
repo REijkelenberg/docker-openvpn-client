@@ -17,7 +17,7 @@ auth-user-pass /vpn/user-auth.pwd
 docker run -d --name vpn-client \
   --cap-add=NET_ADMIN \
   --device /dev/net/tun \
-  --dns <dns.of.openvpn.server>
+  --dns [dns.of.openvpn.server]
   -v /path/with/vpn/configs:/vpn \
   reijkelenberg/openvpn-client --config /vpn/client.ovpn --askpass /vpn/key.pwd
 ```
